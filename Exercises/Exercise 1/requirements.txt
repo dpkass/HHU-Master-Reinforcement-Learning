@@ -1,0 +1,6 @@
+gymnasium
+Pillow
+matplotlib
+torch
+gymnasium[classic-control]
+gymnasium[box2d]
