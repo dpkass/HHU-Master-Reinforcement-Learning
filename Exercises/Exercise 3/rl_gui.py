@@ -88,7 +88,7 @@ class RLGui(widgets.VBox):
         # interact
         self.interact_play = _InfinitePlay(interval=interval, layout=dict(display='inline'))
         self.interact_play.observe(lambda change: self.on_step_play(), names=['value'])
-        self.interact_play.observe(lambda change: self.render(), names=['playing'])
+        self.interact_play.observe(lambda change: self.render(), names=['_playing'])
         self.interact_hbox = self._hbox_with_label('Interact:', self.interact_play)
         if len(self.agents) > 0:
             self.interact_hbox.add_class('margin_top_8')
@@ -112,7 +112,7 @@ class RLGui(widgets.VBox):
 
         self.optim_play = _InfinitePlay(interval=interval, layout=dict(display='inline'))
         self.optim_play.observe(lambda change: self.on_step_optim(), names=['value'])
-        self.optim_play.observe(lambda change: self.render(), names=['playing'])
+        self.optim_play.observe(lambda change: self.render(), names=['_playing'])
 
         self.optim_info_label = self._custom_label('')
         self.optim_info_label.add_class('margin_left_4')
@@ -131,7 +131,7 @@ class RLGui(widgets.VBox):
         # replay
         self.replay_play = _StoppablePlay(value=0, min=0, max=1, step=1, interval=interval, layout=dict(display='inline'))
         self.replay_play.observe(lambda change: self.on_observe_replay(), names=['value'])
-        self.interact_play.observe(lambda change: self.render(), names=['playing'])
+        self.interact_play.observe(lambda change: self.render(), names=['_playing'])
         self.replay_hbox = self._hbox_with_label('Replay:', self.replay_play)
 
         self.step_slider = widgets.IntSlider(value=0, min=0, max=1, step=1)
@@ -265,7 +265,7 @@ class RLGui(widgets.VBox):
             show_widgets.append(self.replay_vbox)
 
             self.agent_buttons.disabled = False
-            self.episode_button.disabled = self.replay_play.playing
+            self.episode_button.disabled = self.replay_play._playing
         else:
             self.episode_button.description = 'Truncate'
             show_widgets.append(self.episode_button)
@@ -322,7 +322,7 @@ class RLGui(widgets.VBox):
 
                         self.optim_info_label.value = str(cmd.message) if cmd.message is not None else ''
 
-                        is_playing = self.interact_play.playing or self.optim_play.playing
+                        is_playing = self.interact_play._playing or self.optim_play._playing
                         for option, button in zip(self.optim_init.options.keys(), self.optim_option_hbox.children):
                             if is_playing:
                                 button.disabled = True
@@ -341,10 +341,10 @@ class RLGui(widgets.VBox):
                     hide_widgets.extend([self.optim_vbox])
                     self.optim_play.stop()
 
-            self.optim_play.disabled = self.interact_play.playing
-            self.interact_play.disabled = self.optim_play.playing
+            self.optim_play.disabled = self.interact_play._playing
+            self.interact_play.disabled = self.optim_play._playing
 
-            is_playing = self.interact_play.playing or self.optim_play.playing
+            is_playing = self.interact_play._playing or self.optim_play._playing
             self.agent_buttons.disabled = is_playing
             self.episode_button.disabled = is_playing
             for button in self.user_action_hbox.children:
@@ -680,13 +680,13 @@ class RLParamsResult(str, Enum):
 class _StoppablePlay(widgets.Play):
 
     def stop(self):
-        #self.traits()['playing'].set(self, False)
-        if self.playing:
-            self.playing = False
+        #self.traits()['_playing'].set(self, False)
+        if self._playing:
+            self._playing = False
             self.value = self.min
     
     def start(self):
-        self.playing = True
+        self._playing = True
 
 
 class _InfinitePlay(_StoppablePlay):
