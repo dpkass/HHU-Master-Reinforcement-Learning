@@ -2,6 +2,5 @@ gymnasium
 Pillow
 matplotlib
 torch
-tqdm
 gymnasium[classic-control]
 gymnasium[box2d]
